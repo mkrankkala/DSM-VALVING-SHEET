@@ -345,6 +345,7 @@ function openSettings() {
   document.getElementById('settingKey').value = localStorage.getItem(TRELLO_KEY_KEY) || '';
   document.getElementById('settingToken').value = localStorage.getItem(TRELLO_TOKEN_KEY) || '';
   document.getElementById('settingBoardId').value = localStorage.getItem(BOARD_ID_KEY) || '';
+  document.getElementById('settingAnthropicKey').value = localStorage.getItem('anthropicKey') || '';
   document.getElementById('settingsPanel').style.display = 'block';
 }
 function closeSettings() { document.getElementById('settingsPanel').style.display = 'none'; }
@@ -457,9 +458,20 @@ async function handleValvingPhoto(event) {
   });
 
   try {
+    const anthropicKey = localStorage.getItem('anthropicKey') || '';
+    if (!anthropicKey) {
+      status.textContent = '⚠ Anthropic API key not set — add it in Settings';
+      status.style.color = '#e05555';
+      return;
+    }
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': anthropicKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 1000,
@@ -636,9 +648,20 @@ async function readHandwriting(id) {
   const base64 = dataUrl.split(',')[1];
 
   try {
+    const anthropicKey = localStorage.getItem('anthropicKey') || '';
+    if (!anthropicKey) {
+      status.textContent = '⚠ Anthropic API key not set — add it in Settings';
+      status.style.color = '#e05555';
+      return;
+    }
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': anthropicKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
